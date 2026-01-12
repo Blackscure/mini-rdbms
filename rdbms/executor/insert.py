@@ -1,5 +1,4 @@
-def execute_insert(stmt, db):
-    table = db.get_table(stmt.table)
-    row = dict(zip(table.columns.keys(), stmt.values))
-    table.insert(row)
+def execute_insert(stmt, manager):
+    table = manager.current.get_table(stmt.table)
+    table.insert(stmt.values)
     return "Row inserted"

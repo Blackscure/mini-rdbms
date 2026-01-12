@@ -4,6 +4,10 @@ class CreateDatabase:
 class UseDatabase:
     def __init__(self, name): self.name = name
 
+
+class ShowDatabases:
+    pass
+
 class CreateTable:
     def __init__(self, name, columns):
         self.name = name
@@ -29,3 +33,11 @@ class Delete:
     def __init__(self, table, where):
         self.table = table
         self.where = where
+
+
+class Join:
+    def __init__(self, left, right, left_col, right_col):
+        self.left = left
+        self.right = right
+        self.left_col = left_col
+        self.right_col = right_col

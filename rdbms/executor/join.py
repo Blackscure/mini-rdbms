@@ -1,19 +1,11 @@
-from rdbms.core.database import db
+def execute_join(stmt, manager):
+    left = manager.current.get_table(stmt.left)
+    right = manager.current.get_table(stmt.right)
 
-def execute_join(stmt):
-    left = db.get_table(stmt.left)
-    right = db.get_table(stmt.right)
-    results = []
+    result = []
+    for l in left.rows:
+        for r in right.rows:
+            if l[stmt.left_col] == r[stmt.right_col]:
+                result.append({**l, **r})
 
-    if stmt.right_key in right.indexes:
-        idx = right.indexes[stmt.right_key]
-        for l in left.rows:
-            for rid in idx.map.get(l[stmt.left_key], []):
-                results.append({**l, **right.rows[rid]})
-    else:
-        for l in left.rows:
-            for r in right.rows:
-                if l[stmt.left_key] == r[stmt.right_key]:
-                    results.append({**l, **r})
-
-    return results
+    return result
