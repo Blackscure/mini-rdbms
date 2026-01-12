@@ -1,0 +1,159 @@
+# 🗄️ Mini RDBMS (Python)
+
+A **simple relational database management system (RDBMS)** implemented in **pure Python**.  
+This project demonstrates core database engine concepts such as SQL parsing, table management, indexing, joins, and an interactive REPL.
+
+The project is **educational** in nature and focuses on understanding how relational databases work internally—without relying on existing database engines or ORMs.
+
+---
+
+## 📌 Features
+
+### ✅ SQL-like Interface
+- Custom SQL tokenizer and parser
+- Abstract Syntax Tree (AST) representation
+- Supports a subset of SQL syntax
+
+Example:
+```sql
+CREATE TABLE users (
+  id INT PRIMARY KEY,
+  email TEXT UNIQUE,
+  age INT
+);
+
+INSERT INTO users VALUES (1, 'test@example.com', 30);
+SELECT * FROM users;
+
+### Table Definition & Data Types
+
+Supported column data types:
+
+- INT
+- TEXT
+- FLOAT (optional)
+- BOOL (optional)
+
+Constraints:
+
+- PRIMARY KEY
+- UNIQUE
+
+### CRUD Operations
+
+- CREATE TABLE
+- INSERT
+- SELECT
+- UPDATE
+- DELETE
+
+### Indexing
+
+- Basic hash-based indexes
+- Used for:
+- Primary keys
+- Unique constraints
+- Equality-based lookups (WHERE column = value)
+- Manual index creation via CREATE INDEX
+
+### JOIN Support
+
+- Supports INNER JOIN
+- Equality join conditions
+- Implemented using a nested-loop join strategy
+
+```
+    SELECT users.id, orders.amount
+    FROM users
+    JOIN orders ON users.id = orders.user_id;
+
+### Interactive REPL
+
+- SQL shell similar to sqlite3 or psql
+- Supports multi-line queries
+- Persistent database state during a session
+
+
+mini_rdbms/
+├── main.py
+│
+├── rdbms/
+│   ├── __init__.py
+│
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── database.py      # Database registry and table manager
+│   │   ├── table.py         # Table schema, rows, constraints
+│   │   └── index.py         # Hash-based index implementation
+│
+│   ├── sql/
+│   │   ├── __init__.py
+│   │   ├── tokenizer.py     # SQL tokenizer
+│   │   ├── parser.py        # SQL parser
+│   │   └── ast.py           # AST node definitions
+│
+│   ├── executor/
+│   │   ├── __init__.py
+│   │   ├── dispatcher.py    # Routes AST nodes to executors
+│   │   ├── create.py        # CREATE TABLE execution
+│   │   ├── insert.py        # INSERT execution
+│   │   ├── select.py        # SELECT execution
+│   │   ├── join.py          # JOIN execution
+│   │   └── create_index.py  # CREATE INDEX execution
+│
+│   └── repl/
+│       ├── __init__.py
+│       └── shell.py         # Interactive SQL REPL
+
+### How to Run
+
+## Prerequisites
+
+- Python 3.9+
+- No external dependencies
+- Start the Interactive REPL
+- From the project root:
+
+```
+    python main.py
+
+- you should see
+
+```
+    miniSQL>
+
+## Example Session
+
+```
+    miniSQL> CREATE TABLE users (id INT PRIMARY KEY, email TEXT UNIQUE, age INT);
+    OK
+
+    miniSQL> INSERT INTO users VALUES (1, 'a@b.com', 25);
+    1 row inserted
+
+    miniSQL> SELECT * FROM users;
+    id | email   | age
+    ------------------
+    1  | a@b.com | 25
+
+### Architecture Overview
+
+ - The system is organized into four main layers:
+
+1. SQL Layer
+- Tokenizes and parses SQL input
+- Produces an AST representation of queries
+
+2. Execution Layer
+
+- Executes parsed queries
+- Handles CRUD operations, joins, and index creation
+
+3. Core Engine
+
+- Manages tables, schemas, rows, and indexes
+- Enforces primary and unique key constraints
+
+4. REPL Interface
+
+- Interactive shell for issuing SQL commands
