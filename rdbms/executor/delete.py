@@ -1,3 +1,4 @@
-def execute_delete(stmt, db):
-    table = db.get_table(stmt.table)
-    return f"{table.delete(stmt.where)} rows deleted"
+def execute_delete(stmt, manager):
+    table = manager.current.get_table(stmt.table)
+    table.delete(stmt.where_col, stmt.where_val)
+    return "Row(s) deleted"

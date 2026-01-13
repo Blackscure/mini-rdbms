@@ -1,42 +1,47 @@
-from rdbms.core.database import DatabaseManager
-from rdbms.sql.parser import parse
 from rdbms.sql.tokenizer import tokenize
+from rdbms.sql.parser import parse
 from rdbms.sql.ast import *
-
-from rdbms.executor.create import execute_create
+from rdbms.executor.create import execute_create, execute_create_database
 from rdbms.executor.insert import execute_insert
 from rdbms.executor.select import execute_select
 from rdbms.executor.update import execute_update
 from rdbms.executor.delete import execute_delete
+from rdbms.executor.join import execute_join
+from rdbms.executor.show import execute_show_databases
+from rdbms.executor.show import execute_show_tables
 
-db_manager = DatabaseManager()
-db_manager.create_database("default")
-db_manager.use_database("default")
+def execute(sql, manager):
+    stmt = parse(tokenize(sql))
 
-def execute(sql):
-    stmt = parse(tokenize(sql.upper()))
+    if isinstance(stmt, ShowDatabases):
+        return execute_show_databases(manager)
 
     if isinstance(stmt, CreateDatabase):
-        db_manager.create_database(stmt.name)
-        return "Database created"
+        return execute_create_database(stmt, manager)
 
     if isinstance(stmt, UseDatabase):
-        db_manager.use_database(stmt.name)
-        return f"Using database {stmt.name}"
+        manager.use_database(stmt.name)
+        return f"Using database '{stmt.name}'"
+    
+    if isinstance(stmt, ShowTables):
+        return execute_show_tables(manager)
 
     if isinstance(stmt, CreateTable):
-        return execute_create(stmt, db_manager.current)
+        return execute_create(stmt, manager)
 
     if isinstance(stmt, Insert):
-        return execute_insert(stmt, db_manager.current)
+        return execute_insert(stmt, manager)
 
     if isinstance(stmt, Select):
-        return execute_select(stmt, db_manager.current)
+        return execute_select(stmt, manager)
 
     if isinstance(stmt, Update):
-        return execute_update(stmt, db_manager.current)
+        return execute_update(stmt, manager)
 
     if isinstance(stmt, Delete):
-        return execute_delete(stmt, db_manager.current)
+        return execute_delete(stmt, manager)
+
+    if isinstance(stmt, Join):
+        return execute_join(stmt, manager)
 
     raise Exception("Unsupported SQL")
