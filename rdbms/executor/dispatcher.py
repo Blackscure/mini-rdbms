@@ -8,6 +8,7 @@ from rdbms.executor.update import execute_update
 from rdbms.executor.delete import execute_delete
 from rdbms.executor.join import execute_join
 from rdbms.executor.show import execute_show_databases
+from rdbms.executor.show import execute_show_tables
 
 def execute(sql, manager):
     stmt = parse(tokenize(sql))
@@ -21,6 +22,9 @@ def execute(sql, manager):
     if isinstance(stmt, UseDatabase):
         manager.use_database(stmt.name)
         return f"Using database '{stmt.name}'"
+    
+    if isinstance(stmt, ShowTables):
+        return execute_show_tables(manager)
 
     if isinstance(stmt, CreateTable):
         return execute_create(stmt, manager)

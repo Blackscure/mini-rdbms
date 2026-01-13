@@ -8,6 +8,8 @@ class UseDatabase:
 class ShowDatabases:
     pass
 
+class ShowTables:
+    pass
 class CreateTable:
     def __init__(self, name, columns):
         self.name = name
