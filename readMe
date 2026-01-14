@@ -5,155 +5,115 @@ This project demonstrates core database engine concepts such as SQL parsing, tab
 
 The project is **educational** in nature and focuses on understanding how relational databases work internally—without relying on existing database engines or ORMs.
 
----
-
 ## 📌 Features
 
-### ✅ SQL-like Interface
-- Custom SQL tokenizer and parser
-- Abstract Syntax Tree (AST) representation
-- Supports a subset of SQL syntax
+- SQL-like interface
+- Interactive REPL (Read–Eval–Print Loop)
+- In-memory database management
+- Multiple databases support
+- Table creation with column data types
+- CRUD operations:
+  - INSERT
+  - SELECT
+  - UPDATE
+  - DELETE
+- SHOW DATABASES and SHOW TABLES
+- Primary key and unique constraint support
+- Basic hash-based indexing
+- Simple INNER JOIN support
+- Case-insensitive SQL keywords and identifiers
 
-Example:
-```sql
-CREATE TABLE users (
-  id INT PRIMARY KEY,
-  email TEXT UNIQUE,
-  age INT
-);
-
-INSERT INTO users VALUES (1, 'test@example.com', 30);
-SELECT * FROM users;
-
-### Table Definition & Data Types
-
-Supported column data types:
-
-- INT
-- TEXT
-- FLOAT (optional)
-- BOOL (optional)
-
-Constraints:
-
-- PRIMARY KEY
-- UNIQUE
-
-### CRUD Operations
-
-- CREATE TABLE
-- INSERT
-- SELECT
-- UPDATE
-- DELETE
-
-### Indexing
-
-- Basic hash-based indexes
-- Used for:
-- Primary keys
-- Unique constraints
-- Equality-based lookups (WHERE column = value)
-- Manual index creation via CREATE INDEX
-
-### JOIN Support
-
-- Supports INNER JOIN
-- Equality join conditions
-- Implemented using a nested-loop join strategy
-
-```
-    SELECT users.id, orders.amount
-    FROM users
-    JOIN orders ON users.id = orders.user_id;
-
-### Interactive REPL
-
-- SQL shell similar to sqlite3 or psql
-- Supports multi-line queries
-- Persistent database state during a session
-
-
+## 📂 Project Structure
 mini_rdbms/
 ├── main.py
 │
 ├── rdbms/
-│   ├── __init__.py
+│ ├── init.py
 │
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── database.py      # Database registry and table manager
-│   │   ├── table.py         # Table schema, rows, constraints
-│   │   └── index.py         # Hash-based index implementation
+│ ├── core/
+│ │ ├── init.py
+│ │ ├── database.py # Database registry and table manager
+│ │ ├── table.py # Table schema, rows, constraints
+│ │ └── index.py # Hash-based index implementation
 │
-│   ├── sql/
-│   │   ├── __init__.py
-│   │   ├── tokenizer.py     # SQL tokenizer
-│   │   ├── parser.py        # SQL parser
-│   │   └── ast.py           # AST node definitions
+│ ├── sql/
+│ │ ├── init.py
+│ │ ├── tokenizer.py # SQL tokenizer
+│ │ ├── parser.py # SQL parser
+│ │ └── ast.py # AST node definitions
 │
-│   ├── executor/
-│   │   ├── __init__.py
-│   │   ├── dispatcher.py    # Routes AST nodes to executors
-│   │   ├── create.py        # CREATE TABLE execution
-│   │   ├── insert.py        # INSERT execution
-│   │   ├── select.py        # SELECT execution
-│   │   ├── join.py          # JOIN execution
-│   │   └── create_index.py  # CREATE INDEX execution
+│ ├── executor/
+│ │ ├── init.py
+│ │ ├── dispatcher.py # Routes AST nodes to executors
+│ │ ├── create.py # CREATE TABLE / DATABASE execution
+│ │ ├── insert.py # INSERT execution
+│ │ ├── select.py # SELECT execution
+│ │ ├── update.py # UPDATE execution
+│ │ ├── delete.py # DELETE execution
+│ │ ├── join.py # JOIN execution
+│ │ ├── create_index.py # CREATE INDEX execution
+│ │ └── show.py # SHOW DATABASES / SHOW TABLES
 │
-│   └── repl/
-│       ├── __init__.py
-│       └── shell.py         # Interactive SQL REPL
+│ └── repl/
+│ ├── init.py
+│ └── shell.py # Interactive SQL REPL
 
-### How to Run
+## ▶️ How to Run
 
-## Prerequisites
+### Prerequisites
+- Python 3.8+
 
-- Python 3.9+
-- No external dependencies
-- Start the Interactive REPL
-- From the project root:
+### Run the REPL
+```bash
+python main.py
 
-```
-    python main.py
+You should See
 
-- you should see
+MiniRDBMS v1.0
+sql>
 
-```
-    miniSQL>
+### Supported SQL Commands
+Database Management
 
-## Example Session
+SHOW DATABASES;
+CREATE DATABASE shop;
+USE shop;
 
-```
-    miniSQL> CREATE TABLE users (id INT PRIMARY KEY, email TEXT UNIQUE, age INT);
-    OK
+Table Management
 
-    miniSQL> INSERT INTO users VALUES (1, 'a@b.com', 25);
-    1 row inserted
+CREATE TABLE users (id INT, name TEXT);
+SHOW TABLES;
 
-    miniSQL> SELECT * FROM users;
-    id | email   | age
-    ------------------
-    1  | a@b.com | 25
+Insert Data
 
-### Architecture Overview
+INSERT INTO users VALUES (1, Alice);
+INSERT INTO users VALUES (2, Bob);
 
- - The system is organized into four main layers:
+Select Data
 
-1. SQL Layer
-- Tokenizes and parses SQL input
-- Produces an AST representation of queries
+SELECT * FROM users;
 
-2. Execution Layer
+Update Data
 
-- Executes parsed queries
-- Handles CRUD operations, joins, and index creation
+UPDATE users SET name = Charlie WHERE id = 2;
 
-3. Core Engine
+Delete Data
 
-- Manages tables, schemas, rows, and indexes
-- Enforces primary and unique key constraints
+DELETE FROM users WHERE id = 1;
 
-4. REPL Interface
+Indexing
 
-- Interactive shell for issuing SQL commands
+CREATE INDEX ON users (id);
+
+Join
+
+CREATE TABLE orders (id INT, user_id INT);
+INSERT INTO orders VALUES (1, 2);
+
+SELECT * FROM users
+JOIN orders
+ON users.id = orders.user_id;
+
+
+
+
