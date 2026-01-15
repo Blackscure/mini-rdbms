@@ -4,6 +4,11 @@ class CreateDatabase:
 class UseDatabase:
     def __init__(self, name): self.name = name
 
+class CreateIndex:
+    def __init__(self, table, column):
+        self.table = table
+        self.column = column
+
 
 class ShowDatabases:
     pass
