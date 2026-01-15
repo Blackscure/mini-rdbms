@@ -64,23 +64,28 @@ class Table:
         return affected_rows
 
     def delete(self, where):
-        """
-        where: tuple (column_name, value) or None (delete all)
-        Returns: number of rows deleted
-        """
         if where is None:
             count = len(self.rows)
             self.rows.clear()
             for idx in self.indexes.values():
-                idx.clear()  # assuming Index has clear() method
+                idx.clear()
             return count
 
         col, val = where
         rows_to_delete = self.select(where)
+        count = len(rows_to_delete)
+
+        if count == 0:
+            return 0
+
+        # Remove from indexes first
         for row in rows_to_delete:
             for c, idx in self.indexes.items():
                 value = row.get(c)
                 if value is not None:
                     idx.remove(value, row)
-            self.rows.remove(row)
-        return len(rows_to_delete)
+
+        # Then filter rows in one pass
+        self.rows = [r for r in self.rows if r not in rows_to_delete]
+
+        return count
