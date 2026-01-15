@@ -32,21 +32,16 @@ def parse(tokens):
         name = tokens[2].upper()
         cols = {}
 
-        # No parentheses → empty table
         if "(" not in tokens:
             return CreateTable(name, cols)
 
-        # With parentheses → parse columns
         try:
             open_paren_idx = tokens.index("(")
-            # Find the matching closing parenthesis (simple version - assumes no nested parens)
             close_paren_idx = tokens.index(")", open_paren_idx)
         except ValueError:
             raise Exception("Syntax error: Missing or unbalanced parentheses in CREATE TABLE")
 
         i = open_paren_idx + 1
-
-        # Empty parentheses: CREATE TABLE name ()
         if i >= close_paren_idx:
             return CreateTable(name, cols)
 
@@ -64,8 +59,6 @@ def parse(tokens):
             }
 
             i += 2
-
-            # Handle comma separator or end of list
             if i < close_paren_idx:
                 if tokens[i] == ",":
                     i += 1
@@ -84,30 +77,51 @@ def parse(tokens):
         try:
             values_start = tokens.index("(") + 1
             values_end = tokens.index(")", values_start)
-            values = tokens[values_start:values_end]
+            raw_tokens = tokens[values_start:values_end]
         except ValueError:
             raise Exception("Invalid INSERT syntax: missing or unbalanced parentheses")
 
+        # Filter out commas and clean quotes/strings
+        values = []
+        i = 0
+        while i < len(raw_tokens):
+            token = raw_tokens[i].strip()
+
+            if token == ",":
+                i += 1
+                continue
+
+            # Handle quoted strings
+            if (token.startswith("'") and token.endswith("'")) or \
+               (token.startswith('"') and token.endswith('"')):
+                cleaned = token[1:-1]
+            else:
+                cleaned = token
+
+            values.append(cleaned)
+            i += 1
+
+        if not values:
+            raise Exception("No values provided in INSERT statement")
+
         return Insert(table, values)
 
-    # SELECT * FROM table
+    # SELECT * FROM table [JOIN ...]
     if tokens[0] == "SELECT":
         if "JOIN" in tokens:
-            # Very basic JOIN support - improve later as needed
             try:
                 from_idx = tokens.index("FROM")
                 join_idx = tokens.index("JOIN")
                 on_idx = tokens.index("ON")
                 return Join(
-                    tokens[from_idx + 1].upper(),     # left table
-                    tokens[join_idx + 1].upper(),     # right table
-                    tokens[on_idx + 1],               # left.col
-                    tokens[on_idx + 3]                # right.col (assumes = was skipped in tokenizer)
+                    tokens[from_idx + 1].upper(),
+                    tokens[join_idx + 1].upper(),
+                    tokens[on_idx + 1],
+                    tokens[on_idx + 3]
                 )
             except (ValueError, IndexError):
                 raise Exception("Invalid JOIN syntax")
 
-        # Simple SELECT FROM
         try:
             from_idx = tokens.index("FROM")
             table_name = tokens[from_idx + 1].upper()
@@ -115,8 +129,92 @@ def parse(tokens):
         except ValueError:
             raise Exception("SELECT statement missing FROM clause")
 
-    # UPDATE and DELETE not fully implemented yet
-    if tokens[0] in ("UPDATE", "DELETE"):
-        raise Exception(f"{tokens[0]} command parsing is not implemented yet")
+    # UPDATE table SET col = value [, col = value ...] [WHERE col = value]
+    if tokens[0] == "UPDATE":
+        if len(tokens) < 5:
+            raise Exception("Incomplete UPDATE statement")
+
+        table = tokens[1].upper()
+        if tokens[2] != "SET":
+            raise Exception("Expected SET after table name")
+
+        updates = {}
+        i = 3
+
+        while i < len(tokens):
+            col = tokens[i].upper()
+            if i + 1 >= len(tokens) or tokens[i + 1] != "=":
+                raise Exception(f"Expected = after {col}")
+
+            i += 2
+            if i >= len(tokens):
+                raise Exception("Value missing after =")
+
+            value = tokens[i]
+            # Clean string literal
+            if (value.startswith("'") and value.endswith("'")) or (value.startswith('"') and value.endswith('"')):
+                value = value[1:-1]
+
+            updates[col] = value
+            i += 1
+
+            if i < len(tokens) and tokens[i] == ",":
+                i += 1
+            elif i < len(tokens) and tokens[i].upper() == "WHERE":
+                break
+            else:
+                break
+
+        if not updates:
+            raise Exception("No SET clauses found")
+
+        where = None
+        if i < len(tokens) and tokens[i].upper() == "WHERE":
+            i += 1
+            if i + 2 >= len(tokens):
+                raise Exception("Incomplete WHERE")
+            if tokens[i + 1] != "=":
+                raise Exception("Only col = value supported in WHERE")
+            where_col = tokens[i].upper()
+            where_val = tokens[i + 2]
+            if (where_val.startswith("'") and where_val.endswith("'")) or (where_val.startswith('"') and where_val.endswith('"')):
+                where_val = where_val[1:-1]
+            where = (where_col, where_val)
+            i += 3
+
+        if i < len(tokens) and tokens[i] != ";":
+            raise Exception(f"Unexpected tokens: {' '.join(tokens[i:])}")
+
+        return Update(table, updates, where)
+
+    # DELETE FROM table [WHERE col = value]
+    if tokens[0] == "DELETE":
+        if len(tokens) < 4 or tokens[1] != "FROM":
+            raise Exception("Expected: DELETE FROM table [WHERE ...]")
+
+        table = tokens[2].upper()
+
+        where = None
+        i = 3
+
+        if i < len(tokens) and tokens[i].upper() == "WHERE":
+            i += 1
+            if i + 2 >= len(tokens):
+                raise Exception("Incomplete WHERE clause in DELETE")
+
+            where_col = tokens[i].upper()
+            if tokens[i + 1] != "=":
+                raise Exception("Only simple 'col = value' supported in WHERE for now")
+
+            where_val = tokens[i + 2]
+            if (where_val.startswith("'") and where_val.endswith("'")) or (where_val.startswith('"') and where_val.endswith('"')):
+                where_val = where_val[1:-1]
+            where = (where_col, where_val)
+            i += 3
+
+        if i < len(tokens) and tokens[i] != ";":
+            raise Exception(f"Extra tokens after DELETE: {' '.join(tokens[i:])}")
+
+        return Delete(table, where)
 
     raise Exception(f"Unsupported SQL: {' '.join(tokens[:8])} ...")
