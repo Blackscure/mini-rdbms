@@ -1,4 +1,9 @@
 def execute_update(stmt, manager):
     table = manager.current.get_table(stmt.table)
-    table.update(stmt.col, stmt.val, stmt.where_col, stmt.where_val)
-    return "Row(s) updated"
+    
+    rows_updated = table.update(
+        where=stmt.where,
+        updates=stmt.updates
+    )
+    
+    return f"{rows_updated} row(s) updated"
