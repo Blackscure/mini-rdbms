@@ -67,6 +67,36 @@ def parse(tokens):
 
         return CreateTable(name, cols)
 
+    # CREATE INDEX ON table (column)
+    if tokens[:2] == ["CREATE", "INDEX"] and "ON" in tokens:
+        try:
+            on_idx = tokens.index("ON")
+            table = tokens[on_idx + 1].upper()
+            
+            # Expect ( column )
+            if on_idx + 2 >= len(tokens) or tokens[on_idx + 2] != "(":
+                raise Exception("Expected '(' after table name")
+            
+            if tokens[-1] == ";" :
+                # remove trailing ; if tokenizer kept it attached to )
+                if tokens[-2] != ")":
+                    raise Exception("Expected ')' before ';'")
+                close_paren_pos = len(tokens) - 2
+            else:
+                if tokens[-1] != ")":
+                    raise Exception("Expected ')' at end of index definition")
+                close_paren_pos = len(tokens) - 1
+
+            column_tokens = tokens[on_idx + 3 : close_paren_pos]
+            if len(column_tokens) != 1:
+                raise Exception("Only single-column indexes supported for now")
+                
+            column = column_tokens[0].upper()
+            
+            return CreateIndex(table, column)
+        except ValueError:
+            raise Exception("Malformed CREATE INDEX statement")
+
     # INSERT INTO table VALUES (...)
     if tokens[0] == "INSERT" and tokens[1] == "INTO":
         if len(tokens) < 4:
