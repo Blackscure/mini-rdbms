@@ -9,6 +9,8 @@ from rdbms.executor.delete import execute_delete
 from rdbms.executor.join import execute_join
 from rdbms.executor.show import execute_show_databases
 from rdbms.executor.show import execute_show_tables
+from rdbms.executor.create_index import execute_create_index
+
 
 def execute(sql, manager):
     stmt = parse(tokenize(sql))
@@ -43,5 +45,9 @@ def execute(sql, manager):
 
     if isinstance(stmt, Join):
         return execute_join(stmt, manager)
+    
+    if isinstance(stmt, CreateIndex):
+        return execute_create_index(stmt, manager)
+
 
     raise Exception("Unsupported SQL")
