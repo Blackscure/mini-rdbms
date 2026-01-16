@@ -146,8 +146,8 @@ def parse(tokens):
                 return Join(
                     tokens[from_idx + 1].upper(),
                     tokens[join_idx + 1].upper(),
-                    tokens[on_idx + 1],
-                    tokens[on_idx + 3]
+                    tokens[on_idx + 1].upper(),
+                    tokens[on_idx + 3].upper()
                 )
             except (ValueError, IndexError):
                 raise Exception("Invalid JOIN syntax")

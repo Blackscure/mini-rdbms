@@ -1,6 +1,6 @@
 def execute_join(stmt, manager):
-    left = manager.current.get_table(stmt.left)
-    right = manager.current.get_table(stmt.right)
+    left  = manager.current.get_table(stmt.left.upper())
+    right = manager.current.get_table(stmt.right.upper())
 
     result = []
     for l in left.rows:

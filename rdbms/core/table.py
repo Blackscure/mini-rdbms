@@ -39,12 +39,19 @@ class Table:
         """
         if where is None:
             rows_to_update = self.rows[:]
+        elif isinstance(where, dict):
+            # Multiple conditions
+            rows_to_update = [
+                r for r in self.rows
+                if all(r.get(k) == v for k, v in where.items())
+            ]
         else:
             col, val = where
             if col in self.indexes:
                 rows_to_update = self.indexes[col].find(val)
             else:
                 rows_to_update = [r for r in self.rows if r.get(col) == val]
+
 
         affected_rows = 0
         for row in rows_to_update:
