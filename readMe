@@ -24,39 +24,51 @@ The project is **educational** in nature and focuses on understanding how relati
 - Case-insensitive SQL keywords and identifiers
 
 ## 📂 Project Structure
-mini_rdbms/
-├── main.py
+mini-rdbms/
 │
-├── rdbms/
-│ ├── init.py
+├── app.py
+├── requirements.txt
+├── README.md
 │
-│ ├── core/
-│ │ ├── init.py
-│ │ ├── database.py # Database registry and table manager
-│ │ ├── table.py # Table schema, rows, constraints
-│ │ └── index.py # Hash-based index implementation
+├── rdbms/                     # YOUR mini RDBMS (unchanged core)
+│   ├── __init__.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── database.py
+│   │   ├── table.py
+│   │   └── index.py
+│   │
+│   ├── sql/
+│   │   ├── __init__.py
+│   │   ├── tokenizer.py
+│   │   ├── parser.py
+│   │   └── ast.py
+│   │
+│   ├── executor/
+│   │   ├── __init__.py
+│   │   ├── create.py
+│   │   ├── insert.py
+│   │   ├── select.py
+│   │   ├── update.py
+│   │   ├── delete.py
+│   │   └── show.py
+│   │
+│   └── repl/
+│       └── shell.py
 │
-│ ├── sql/
-│ │ ├── init.py
-│ │ ├── tokenizer.py # SQL tokenizer
-│ │ ├── parser.py # SQL parser
-│ │ └── ast.py # AST node definitions
+├── web/
+│   ├── __init__.py
+│   ├── db.py                  # DB initialization
+│   └── routes.py              # CRUD routes
 │
-│ ├── executor/
-│ │ ├── init.py
-│ │ ├── dispatcher.py # Routes AST nodes to executors
-│ │ ├── create.py # CREATE TABLE / DATABASE execution
-│ │ ├── insert.py # INSERT execution
-│ │ ├── select.py # SELECT execution
-│ │ ├── update.py # UPDATE execution
-│ │ ├── delete.py # DELETE execution
-│ │ ├── join.py # JOIN execution
-│ │ ├── create_index.py # CREATE INDEX execution
-│ │ └── show.py # SHOW DATABASES / SHOW TABLES
-│
-│ └── repl/
-│ ├── init.py
-│ └── shell.py # Interactive SQL REPL
+└── templates/
+    ├── base.html
+    │
+    └── users/
+        ├── list.html          # READ
+        ├── create.html        # CREATE
+        └── edit.html          # UPDATE
+
 
 ## ▶️ How to Run
 
