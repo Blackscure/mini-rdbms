@@ -126,6 +126,25 @@ SELECT * FROM users
 JOIN orders
 ON users.id = orders.user_id;
 
+## Running the Flask Web Application
+
+### Setup Virtual Environment
+python3.12 -m venv venv
+
+Activate the virtual environment
+source venv/bin/activate
+
+you should see
+(venv)
+
+install dependancies
+pip install -r requirements.txt
+
+Run the Flask App
+python3 app.py
+
+
+
 
 
 
