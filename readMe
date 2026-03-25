@@ -1,4 +1,4 @@
-# 🗄️ Mini RDBMS (Python)
+#  Mini RDBMS (Python)
 
 A **simple relational database management system (RDBMS)** implemented in **pure Python**.  
 This project demonstrates core database engine concepts such as SQL parsing, table management, indexing, joins, and an interactive REPL.
