@@ -23,7 +23,7 @@ The project is **educational** in nature and focuses on understanding how relati
 - Simple INNER JOIN support
 - Case-insensitive SQL keywords and identifiers
 
-## 📂 Project Structure
+##  Project Structure
 mini-rdbms/
 │
 ├── app.py
@@ -70,7 +70,7 @@ mini-rdbms/
         └── edit.html          # UPDATE
 
 
-## ▶️ How to Run
+##  How to Run
 
 ### Prerequisites
 - Python 3.8+
