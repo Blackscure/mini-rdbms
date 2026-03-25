@@ -5,7 +5,7 @@ This project demonstrates core database engine concepts such as SQL parsing, tab
 
 The project is **educational** in nature and focuses on understanding how relational databases work internally—without relying on existing database engines or ORMs.
 
-## 📌 Features
+##  Features
 
 - SQL-like interface
 - Interactive REPL (Read–Eval–Print Loop)
